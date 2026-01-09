@@ -2,6 +2,10 @@
   font-family: "Saeada";
   src: url("../static/assets/fonts/LTSaeada-Black.otf") format("opentype");
 }
+
+/* =========================
+   GLOBAL
+========================= */
 * {
   font-family: Saeada, sans-serif;
   margin: 0;
@@ -10,26 +14,21 @@
 
 html,
 body {
-  background-color: #072446;
+  background-color: #1f132e;
   overflow: hidden;
 }
 
+/* =========================
+   THREE.JS CONTAINERS
+========================= */
 #webgl {
   width: 100vw;
   height: 100vh;
   pointer-events: auto;
 }
 
-#cssArcadeMachine {
-  pointer-events: none;
-  cursor: pointer;
-}
-
-#cssLeftMonitor {
-  pointer-events: none;
-  cursor: pointer;
-}
-
+#cssArcadeMachine,
+#cssLeftMonitor,
 #cssRightMonitor {
   pointer-events: none;
   cursor: pointer;
@@ -40,11 +39,19 @@ body {
   display: none;
 }
 
+/* =========================
+   BANNER / NAVBAR
+========================= */
 .banner {
   display: flex;
-  background-color: #0a3362;
+  background: linear-gradient(
+    90deg,
+    #1f132e,
+    #2a1a3d,
+    #3b2460
+  );
   color: #eda72d;
-  padding: 10px 0px;
+  padding: 10px 0;
   text-align: center;
   font-size: 1.5vw;
   position: absolute;
@@ -52,45 +59,41 @@ body {
   height: 60px;
   left: 0;
   width: 100vw;
-  flex-direction: row;
   align-items: center;
   justify-content: space-around;
   z-index: 1;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8);
   transition: top 0.5s ease-in-out;
 }
 
 .banner-link {
-  text-align: center;
   user-select: none;
-  justify-content: center;
   cursor: pointer;
   margin: 0 1vw;
-  transition: 0.2s ease-in-out;
+  transition: color 0.2s ease, transform 0.2s ease;
 }
 
 .banner-link:hover {
-  font-size: 1.75vw;
+  color: #c084fc;
+  transform: scale(1.1);
 }
 
+/* =========================
+   BACK BUTTON
+========================= */
 .circular-button {
   position: absolute;
-  display: block;
   bottom: 50px;
   left: 50px;
   width: 100px;
-  opacity: 0;
   height: 100px;
   border-radius: 50%;
-  background-color: #0a3362;
-  text-align: center;
-  line-height: 100px;
-  text-decoration: none;
+  background-color: #2a1a3d;
+  opacity: 0;
   visibility: hidden;
-  font-size: 16px;
   cursor: pointer;
   transition: opacity 1s, visibility 1s, background-size 0.2s ease-in-out;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8);
   z-index: 2;
   background-image: url("../static/assets/svg/arrow-back.svg");
   background-size: 70%;
@@ -107,6 +110,9 @@ body {
   background-size: 75%;
 }
 
+/* =========================
+   WHITEBOARD BUTTONS
+========================= */
 .button-row {
   visibility: hidden;
   opacity: 0;
@@ -125,26 +131,31 @@ body {
 }
 
 .circular-button-whiteboard {
-  display: inline-block;
-  transition: opacity 1s, visibility 1s, background-size 0.2s ease-in-out;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
   width: 100px;
   height: 100px;
+  margin: 0 20px;
+  border-radius: 50%;
+  background-color: #2a1a3d;
   background-size: 70%;
   background-position: center;
   background-repeat: no-repeat;
-  border: 5px solid #ffffff00;
-  border-radius: 50%;
-  background-color: #0a3362;
-  margin: 0px 20px;
+  border: 5px solid transparent;
   cursor: pointer;
-  transition: all 0.5s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8);
+  transition: all 0.4s ease;
+}
+
+.circular-button-whiteboard:hover {
+  background-size: 80%;
 }
 
 .whiteboard-selected {
-  border: 5px solid #eda72d;
+  border-color: #eda72d;
 }
 
+/* =========================
+   RUBIK MESSAGE
+========================= */
 .rubik-message {
   text-align: center;
   visibility: hidden;
@@ -165,26 +176,22 @@ body {
   opacity: 1;
 }
 
+/* =========================
+   AUDIO BUTTON
+========================= */
 .audio-button {
-  transition: opacity 1s, visibility 1s, background-size 0.2s ease-in-out,
-    0.2s ease-in-out, background-image 1s ease-in-out;
   position: absolute;
-  display: block;
   bottom: 50px;
   right: 50px;
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background-color: #0a3362;
-  text-align: center;
-  line-height: 100px;
-  text-decoration: none;
-  font-size: 16px;
+  background-color: #2a1a3d;
   opacity: 0;
   visibility: hidden;
   cursor: pointer;
   transition: opacity 1s, visibility 1s, background-size 0.2s ease-in-out;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8);
   z-index: 2;
   background-image: url("../static/assets/svg/audio-volume-high.svg");
   background-size: 50%;
@@ -192,43 +199,43 @@ body {
   background-repeat: no-repeat;
 }
 
+.show-audio-button {
+  visibility: visible;
+  opacity: 0.4;
+}
+
 .audio-button:hover {
   opacity: 1;
 }
+
 .audio-button-muted {
   background-image: url("../static/assets/svg/audio-volume-muted.svg");
 }
 
-.circular-button-whiteboard:hover {
-  background-size: 80%;
-}
-
+/* =========================
+   LOADING SCREEN
+========================= */
 .loadingScreen {
   user-select: none;
-  border: solid 0.5em #eda72d;
   width: 20vmin;
   aspect-ratio: 1;
-  text-align: center;
+  border-radius: 50%;
+  background: #2a1a3d;
+  border: solid 0.5em #eda72d;
   color: #eda72d;
+  display: flex;
   align-items: center;
   justify-content: space-around;
-  border-radius: 50%;
-  background: #0a3362;
-  --mask: linear-gradient(#0a3362, #0a3362) padding-box,
-    conic-gradient(#0a3362 var(--p, 0%), transparent 0%) border-box;
-  visibility: hidden;
-  opacity: 0;
-  -webkit-mask: var(--mask);
-  mask: var(--mask);
-  transform: translate(-50%, -50%);
-  display: flex;
   text-align: center;
   font-size: 1.7em;
   position: absolute;
   top: 50%;
   left: 50%;
+  transform: translate(-50%, -50%);
+  visibility: hidden;
+  opacity: 0;
   z-index: 1;
-  box-shadow: 0 2px 1px rgba(0, 0, 0, 1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 1);
   transition: visibility 1s ease, opacity 1s ease, color 1s ease,
     font-size 0.5s ease;
 }
@@ -238,17 +245,17 @@ body {
 }
 
 .finished-load {
-  color: #0a3362 !important;
+  color: #2a1a3d !important;
 }
 
 .show-loading-screen {
   visibility: visible;
   opacity: 1;
 }
-.show-audio-button {
-  visibility: visible;
-  opacity: 0.4;
-}
+
+/* =========================
+   MOBILE WARNING
+========================= */
 .mobile-text {
   display: none;
   position: fixed;
