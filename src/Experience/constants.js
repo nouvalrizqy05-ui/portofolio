@@ -27,7 +27,7 @@ export const CRT_UNIFORMS = {
   uBrightness: 2.5,
   uVignetteRoundness: 1,
 };
-export const ARCADE_IFRAME_SRC = "https://nouval-arcade-machine.vercel.app";
+export const ARCADE_IFRAME_SRC = "https://nouval-drivemad.netlify.app/";
 export const ARCADE_IFRAME_PADDING = "16px";
 export const ARCADE_MACHINE_CAMERA_POSITION = new Vector3(-1.7, 5.5, 2.3009);
 export const ARCADE_MACHINE_CAMERA_QUATERNION = new Quaternion(
