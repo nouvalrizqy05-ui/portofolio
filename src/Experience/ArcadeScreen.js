@@ -58,98 +58,86 @@ export default class ArcadeScreen {
     container.style.height = this.screenSize.height + "px";
 
     const iframe = document.createElement("iframe");
-
     iframe.src = ARCADE_IFRAME_SRC;
     iframe.style.width = this.screenSize.width + "px";
     iframe.style.height = this.screenSize.height + "px";
     iframe.style.padding = ARCADE_IFRAME_PADDING;
-
-    iframe.style.transparent = true;
+    iframe.style.border = "0px";
     iframe.id = "arcade-screen";
-    iframe.style.boxSizing = "border-box";
     iframe.style.background = "black";
+    
+    // Memberikan izin teknis untuk kontrol keyboard dan suara otomatis
+    iframe.setAttribute('allow', 'autoplay; fullscreen; pointer-lock');
+
     container.appendChild(iframe);
+    this.iframe = iframe;
+
     iframe.addEventListener("load", () => {
       this.iframeWindow = iframe.contentWindow;
     });
 
     const css3dobject = new CSS3DObject(container);
-
     css3dobject.scale.copy(ARCADE_CSS_OBJECT_SCALE);
     css3dobject.position.copy(ARCADE_CSS_OBJECT_POSITION);
     css3dobject.rotateY(ARCADE_CSS_OBJECT_ROTATION_Y);
     css3dobject.rotateX(ARCADE_CSS_OBJECT_ROTATION_X);
     this.cssArcadeMachineScene.add(css3dobject);
+
     const materialCRT = new ShaderMaterial({
       blending: NoBlending,
       side: DoubleSide,
       uniforms: {
         uCurvature: { value: CRT_UNIFORMS.uCurvature },
-        uScreenResolution: {
-          value: CRT_UNIFORMS.uScreenResolution,
-        },
-        uScanLineOpacity: {
-          value: CRT_UNIFORMS.uScanLineOpacity,
-        },
-        uBaseColor: {
-          value: CRT_UNIFORMS.uBaseColor,
-        },
-        uColor: {
-          value: CRT_UNIFORMS.uColor,
-        },
-        uVignetteOpacity: {
-          value: CRT_UNIFORMS.uVignetteOpacity,
-        },
+        uScreenResolution: { value: CRT_UNIFORMS.uScreenResolution },
+        uScanLineOpacity: { value: CRT_UNIFORMS.uScanLineOpacity },
+        uBaseColor: { value: CRT_UNIFORMS.uBaseColor },
+        uColor: { value: CRT_UNIFORMS.uColor },
+        uVignetteOpacity: { value: CRT_UNIFORMS.uVignetteOpacity },
         uBrightness: { value: CRT_UNIFORMS.uBrightness },
-        uVignetteRoundness: {
-          value: CRT_UNIFORMS.uVignetteOpacity,
-        },
+        uVignetteRoundness: { value: CRT_UNIFORMS.uVignetteOpacity },
       },
       vertexShader: vertexShader,
       fragmentShader: fragmentShader,
     });
-    // Create plane geometry
-    const geometry = new PlaneGeometry(
-      this.screenSize.width,
-      this.screenSize.height
-    );
-    // Create the GL plane mesh
-    this.model.screen = new Mesh(geometry, materialCRT);
 
-    // Copy the position, rotation and scale of the CSS plane to the GL plane
+    const geometry = new PlaneGeometry(this.screenSize.width, this.screenSize.height);
+    this.model.screen = new Mesh(geometry, materialCRT);
     this.model.screen.position.copy(css3dobject.position);
     this.model.screen.rotation.copy(css3dobject.rotation);
     this.model.screen.scale.copy(css3dobject.scale);
     this.model.screen.name = "arcadeMachineScreen";
 
-    // Add to gl scene
     this.model.arcadeMachineModel.add(this.model.screen);
   };
 
-  handleKeyDownParent = (event) => {
-    this.iframeWindow.postMessage(
-      { type: "keyDownParent", key: event.key },
-      "*"
+  onMouseMove = () => {
+    // Memastikan deteksi kursor pada mesin arcade atau layar game
+    const isOverArcade = (
+        this.experience.world.navigation?.objectRaycasted?.object?.name === "arcadeMachine" ||
+        this.experience.world.navigation?.objectRaycasted?.object?.name === "arcadeMachineScreen"
     );
+
+    if (isOverArcade) {
+      // Nonaktifkan kontrol kamera portofolio agar tidak bentrok dengan kontrol game
+      this.experience.navigation.orbitControls.enabled = false;
+      this.webglElement.style.pointerEvents = "none";
+      // Fokuskan input keyboard langsung ke dalam game mobil
+      this.iframe.focus(); 
+    } else {
+      this.experience.navigation.orbitControls.enabled = true;
+      this.webglElement.style.pointerEvents = "auto";
+    }
+  };
+
+  handleKeyDownParent = (event) => {
+    if (this.iframeWindow) {
+      this.iframeWindow.postMessage({ type: "keyDownParent", key: event.key }, "*");
+    }
   };
 
   handleKeyUpParent = (event) => {
-    this.iframeWindow.postMessage({ type: "keyUpParent", key: event.key }, "*");
-  };
-
-  onMouseMove = () => {
-    if (
-      this.objectRaycasted &&
-      this.objectRaycasted.object &&
-      this.objectRaycasted.object.name == "arcadeMachine"
-    ) {
-      this.experience.navigation.orbitControls.enableDamping = false;
-      this.experience.navigation.orbitControls.enabled = false;
-      this.webglElement.style.pointerEvents = "none";
-    } else {
-      this.experience.navigation.orbitControls.enableDamping = true;
-      this.experience.navigation.orbitControls.enabled = true;
-      this.webglElement.style.pointerEvents = "auto";
+    if (this.iframeWindow) {
+      this.iframeWindow.postMessage({ type: "keyUpParent", key: event.key }, "*");
     }
   };
 
@@ -158,25 +146,19 @@ export default class ArcadeScreen {
     window.addEventListener("keyup", this.handleKeyUpParent);
     window.addEventListener("pointermove", this.onMouseMove);
     window.addEventListener("message", this.receiveMessage, false);
-    this.onMouseMove();
   };
+
   deactivateControls = () => {
     window.removeEventListener("keydown", this.handleKeyDownParent);
     window.removeEventListener("keyup", this.handleKeyUpParent);
     window.removeEventListener("pointermove", this.onMouseMove);
     window.removeEventListener("message", this.receiveMessage, false);
   };
+
   receiveMessage = (event) => {
-    if (event.data == "hit") {
-      this.audioManager.playSingleAudio("hit", 1);
-    } else if (event.data == "tetris") {
-      this.audioManager.playSingleAudio("tetris", 1);
-    } else if (event.data == "die") {
-      this.audioManager.playSingleAudio("die", 1);
-    } else if (event.data == "select1") {
-      this.audioManager.playSingleAudio("select1", 1);
-    } else if (event.data == "select2") {
-      this.audioManager.playSingleAudio("select2", 1);
+    const audios = ["hit", "tetris", "die", "select1", "select2"];
+    if (audios.includes(event.data)) {
+      this.audioManager.playSingleAudio(event.data, 1);
     }
   };
 }
