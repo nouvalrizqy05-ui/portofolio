@@ -1,26 +1,12 @@
-import {
-  Vector2,
-  ShaderMaterial,
-  DoubleSide,
-  NoBlending,
-  PlaneGeometry,
-  Mesh,
-} from "three";
-
+import { Vector2, ShaderMaterial, DoubleSide, NoBlending, PlaneGeometry, Mesh } from "three";
 import Experience from "./Experience.js";
 import { CSS3DObject } from "three/examples/jsm/renderers/CSS3DRenderer.js";
 import fragmentShader from "./shaders/screenEffect/fragment.glsl";
 import vertexShader from "./shaders/screenEffect/vertex.glsl";
 import {
-  ARCADE_SCREEN_WIDTH,
-  ARCADE_SCREEN_HEIGHT,
-  ARCADE_CSS_OBJECT_SCALE,
-  ARCADE_CSS_OBJECT_POSITION,
-  ARCADE_CSS_OBJECT_ROTATION_X,
-  ARCADE_CSS_OBJECT_ROTATION_Y,
-  CRT_UNIFORMS,
-  ARCADE_IFRAME_SRC,
-  ARCADE_IFRAME_PADDING,
+  ARCADE_SCREEN_WIDTH, ARCADE_SCREEN_HEIGHT, ARCADE_CSS_OBJECT_SCALE,
+  ARCADE_CSS_OBJECT_POSITION, ARCADE_CSS_OBJECT_ROTATION_X,
+  ARCADE_CSS_OBJECT_ROTATION_Y, CRT_UNIFORMS, ARCADE_IFRAME_SRC, ARCADE_IFRAME_PADDING
 } from "./constants.js";
 
 export default class ArcadeScreen {
@@ -31,11 +17,9 @@ export default class ArcadeScreen {
     this.cssArcadeMachineScene = this.experience.cssArcadeMachineScene;
     this.scene = this.experience.scene;
     this.resources = this.experience.resources;
-    this.mouse = this.experience.mouse;
     this.screenSize = new Vector2(ARCADE_SCREEN_WIDTH, ARCADE_SCREEN_HEIGHT);
     this.model = {};
     this.arcadeMachineMaterial = this.experience.world.baked.model.material2;
-    this.maxAnisotropy = this.renderer.capabilities.getMaxAnisotropy();
     this.audioManager = this.experience.world.audioManager;
     this.setModel();
     this.setArcadeScreen();
@@ -43,11 +27,7 @@ export default class ArcadeScreen {
 
   setModel = () => {
     this.model.arcadeMachineModel = this.resources.items.arcadeMachine.scene;
-    this.model.arcadeMachineModel.traverse((child) => {
-      if (child.isMesh) {
-        child.material = this.arcadeMachineMaterial;
-      }
-    });
+    this.model.arcadeMachineModel.traverse((child) => { if (child.isMesh) child.material = this.arcadeMachineMaterial; });
     this.model.arcadeMachineModel.name = "arcadeMachine";
     this.scene.add(this.model.arcadeMachineModel);
   };
@@ -64,17 +44,11 @@ export default class ArcadeScreen {
     iframe.style.padding = ARCADE_IFRAME_PADDING;
     iframe.style.border = "0px";
     iframe.id = "arcade-screen";
-    iframe.style.background = "black";
-    
-    // Memberikan izin teknis untuk kontrol keyboard dan suara otomatis
-    iframe.setAttribute('allow', 'autoplay; fullscreen; pointer-lock');
+    iframe.setAttribute('allow', 'autoplay; fullscreen; pointer-lock; keyboard');
 
     container.appendChild(iframe);
     this.iframe = iframe;
-
-    iframe.addEventListener("load", () => {
-      this.iframeWindow = iframe.contentWindow;
-    });
+    iframe.addEventListener("load", () => { this.iframeWindow = iframe.contentWindow; });
 
     const css3dobject = new CSS3DObject(container);
     css3dobject.scale.copy(ARCADE_CSS_OBJECT_SCALE);
@@ -84,8 +58,7 @@ export default class ArcadeScreen {
     this.cssArcadeMachineScene.add(css3dobject);
 
     const materialCRT = new ShaderMaterial({
-      blending: NoBlending,
-      side: DoubleSide,
+      blending: NoBlending, side: DoubleSide,
       uniforms: {
         uCurvature: { value: CRT_UNIFORMS.uCurvature },
         uScreenResolution: { value: CRT_UNIFORMS.uScreenResolution },
@@ -96,48 +69,26 @@ export default class ArcadeScreen {
         uBrightness: { value: CRT_UNIFORMS.uBrightness },
         uVignetteRoundness: { value: CRT_UNIFORMS.uVignetteOpacity },
       },
-      vertexShader: vertexShader,
-      fragmentShader: fragmentShader,
+      vertexShader, fragmentShader,
     });
 
-    const geometry = new PlaneGeometry(this.screenSize.width, this.screenSize.height);
-    this.model.screen = new Mesh(geometry, materialCRT);
+    this.model.screen = new Mesh(new PlaneGeometry(this.screenSize.width, this.screenSize.height), materialCRT);
     this.model.screen.position.copy(css3dobject.position);
     this.model.screen.rotation.copy(css3dobject.rotation);
     this.model.screen.scale.copy(css3dobject.scale);
     this.model.screen.name = "arcadeMachineScreen";
-
     this.model.arcadeMachineModel.add(this.model.screen);
   };
 
   onMouseMove = () => {
-    // Memastikan deteksi kursor pada mesin arcade atau layar game
-    const isOverArcade = (
-        this.experience.world.navigation?.objectRaycasted?.object?.name === "arcadeMachine" ||
-        this.experience.world.navigation?.objectRaycasted?.object?.name === "arcadeMachineScreen"
-    );
-
+    const isOverArcade = (this.experience.world.navigation?.objectRaycasted?.object?.name === "arcadeMachineScreen");
     if (isOverArcade) {
-      // Nonaktifkan kontrol kamera portofolio agar tidak bentrok dengan kontrol game
       this.experience.navigation.orbitControls.enabled = false;
       this.webglElement.style.pointerEvents = "none";
-      // Fokuskan input keyboard langsung ke dalam game mobil
       this.iframe.focus(); 
     } else {
       this.experience.navigation.orbitControls.enabled = true;
       this.webglElement.style.pointerEvents = "auto";
-    }
-  };
-
-  handleKeyDownParent = (event) => {
-    if (this.iframeWindow) {
-      this.iframeWindow.postMessage({ type: "keyDownParent", key: event.key }, "*");
-    }
-  };
-
-  handleKeyUpParent = (event) => {
-    if (this.iframeWindow) {
-      this.iframeWindow.postMessage({ type: "keyUpParent", key: event.key }, "*");
     }
   };
 
@@ -146,19 +97,20 @@ export default class ArcadeScreen {
     window.addEventListener("keyup", this.handleKeyUpParent);
     window.addEventListener("pointermove", this.onMouseMove);
     window.addEventListener("message", this.receiveMessage, false);
+    
+    // Paksa fokus saat layar diklik
+    this.webglElement.addEventListener("mousedown", () => {
+        if (this.experience.world.navigation?.objectRaycasted?.object?.name === "arcadeMachineScreen") {
+            this.iframe.focus();
+        }
+    });
   };
 
-  deactivateControls = () => {
-    window.removeEventListener("keydown", this.handleKeyDownParent);
-    window.removeEventListener("keyup", this.handleKeyUpParent);
-    window.removeEventListener("pointermove", this.onMouseMove);
-    window.removeEventListener("message", this.receiveMessage, false);
-  };
-
-  receiveMessage = (event) => {
+  handleKeyDownParent = (e) => { if (this.iframeWindow) this.iframeWindow.postMessage({ type: "keyDownParent", key: e.key }, "*"); };
+  handleKeyUpParent = (e) => { if (this.iframeWindow) this.iframeWindow.postMessage({ type: "keyUpParent", key: e.key }, "*"); };
+  
+  receiveMessage = (e) => {
     const audios = ["hit", "tetris", "die", "select1", "select2"];
-    if (audios.includes(event.data)) {
-      this.audioManager.playSingleAudio(event.data, 1);
-    }
+    if (audios.includes(e.data)) this.audioManager.playSingleAudio(e.data, 1);
   };
 }
