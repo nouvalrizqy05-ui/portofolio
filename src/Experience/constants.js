@@ -13,7 +13,7 @@ export const ARCADE_SCREEN_HEIGHT = 1210.1182617331252;
 export const ARCADE_CSS_OBJECT_SCALE = new Vector3(0.00102, 0.00102, 0.00102);
 
 // REVISI: Nilai X digeser sedikit ke arah luar (3.25776) 
-// agar tidak terjadi z-fighting/kedipan dengan mesh monitor
+// untuk mencegah bentrokan visual (z-fighting) dengan mesh layar 3D.
 export const ARCADE_CSS_OBJECT_POSITION = new Vector3(3.25776, 2.7421, 2.3009);
 
 export const ARCADE_CSS_OBJECT_ROTATION_X = -Math.PI / 7;
@@ -49,7 +49,7 @@ export const ARCADE_MACHINE_CAMERA_TARGET = new Vector3(
   2.3009
 );
 
-// Camera
+// Camera General
 export const CAMERA_POSITION = new Vector3(-23, 17, 23);
 export const CAMERA_QUATERNION = new Quaternion(
   -0.19229498096591757,
@@ -83,7 +83,7 @@ export const CONFETTI_COLORS = [
   0xf03559, 0xf272b3, 0x9be4f2, 0xffeb5e, 0xffb300, 0x7bff8b,
 ];
 
-// Monitors
+// Monitors General
 export const MONITOR_SCREEN_WIDTH = 1370.178;
 export const MONITOR_SCREEN_HEIGHT = 764.798;
 export const MONITOR_IFRAME_PADDING = "8px";
@@ -135,7 +135,7 @@ export const RIGHT_MONITOR_CAMERA_TARGET = new Vector3(
   -4.14566
 );
 
-// Navigate
+// Navigate & Interactions
 export const ELEMENTS_TO_RAYCAST = [
   "rubikGroup",
   "linkedin",
@@ -188,10 +188,10 @@ export const RUBIK_ROTATION_Y = (-152.484 * Math.PI) / 180;
 export const RUBIK_POSITION = new Vector3(-0.67868, 1.499, -3.92849);
 export const RUBIK_SCALE = 0.021432;
 
-// Links
+// Social Links
 export const LINKEDIN_URL = "https://www.linkedin.com/in/muhammad-nouval-ar-rizqy-9ba777378?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app";
 export const GITHUB_URL = "https://github.com/nouvalrizqy05-ui";
 export const ITCHIO_URL = "#";
 
-// Top Chair
+// Office Props
 export const TOP_CHAIR_POSITION = new Vector3(1.4027, 0.496728, -1.21048);
