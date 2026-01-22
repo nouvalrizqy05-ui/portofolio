@@ -1,4 +1,4 @@
-mport {
+import {
   Vector2,
   ShaderMaterial,
   DoubleSide,
