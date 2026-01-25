@@ -7,15 +7,15 @@ You can now explore it [here](https://muhammadnouvalarrizqy.vercel.app).
 
 ## Links
 
-### Joan's Arcade Machine
+### Nouval's Arcade Machine
 - [Source Code](https://github.com/nouvalrizqy05-ui/nouval-arcade-machine)
 - [Live Demo](https://nouval-arcade-machine.vercel.app/)
 
-### Joan's OS
+### Nouval's OS
 - [Source Code](https://github.com/nouvalrizqy05-ui/nouval-os)
 - [Live Demo](https://nouval-os.vercel.app/)
 
-### Joan's Art Gallery
+### Nouval's Art Gallery
 - [Source Code](https://github.com/nouvalrizqy05-ui/nouval-art-gallery)
 - [Live Demo](https://nouval-art-gallery.vercel.app/)
 
