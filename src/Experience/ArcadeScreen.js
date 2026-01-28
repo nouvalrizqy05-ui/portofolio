@@ -32,54 +32,67 @@ export default class ArcadeScreen {
     this.scene = this.experience.scene;
     this.resources = this.experience.resources;
     this.mouse = this.experience.mouse;
-    this.screenSize = new Vector2(ARCADE_SCREEN_WIDTH, ARCADE_SCREEN_HEIGHT);
+
+    this.screenSize = new Vector2(
+      ARCADE_SCREEN_WIDTH,
+      ARCADE_SCREEN_HEIGHT
+    );
+
     this.model = {};
-    this.arcadeMachineMaterial = this.experience.world.baked.model.material2;
-    this.maxAnisotropy = this.renderer.capabilities.getMaxAnisotropy();
+    this.arcadeMachineMaterial =
+      this.experience.world.baked.model.material2;
+
+    this.maxAnisotropy =
+      this.renderer.capabilities.getMaxAnisotropy();
+
     this.audioManager = this.experience.world.audioManager;
+
     this.setModel();
     this.setArcadeScreen();
   }
 
   setModel = () => {
-    this.model.arcadeMachineModel = this.resources.items.arcadeMachine.scene;
+    this.model.arcadeMachineModel =
+      this.resources.items.arcadeMachine.scene;
+
     this.model.arcadeMachineModel.traverse((child) => {
       if (child.isMesh) {
         child.material = this.arcadeMachineMaterial;
       }
     });
+
     this.model.arcadeMachineModel.name = "arcadeMachine";
     this.scene.add(this.model.arcadeMachineModel);
   };
 
   setArcadeScreen = () => {
     const container = document.createElement("div");
-    container.style.width = this.screenSize.width + "px";
-    container.style.height = this.screenSize.height + "px";
+    container.style.width = `${this.screenSize.width}px`;
+    container.style.height = `${this.screenSize.height}px`;
 
     const iframe = document.createElement("iframe");
-
     iframe.src = ARCADE_IFRAME_SRC;
-    iframe.style.width = this.screenSize.width + "px";
-    iframe.style.height = this.screenSize.height + "px";
+    iframe.style.width = `${this.screenSize.width}px`;
+    iframe.style.height = `${this.screenSize.height}px`;
     iframe.style.padding = ARCADE_IFRAME_PADDING;
-
-    iframe.style.transparent = true;
-    iframe.id = "arcade-screen";
     iframe.style.boxSizing = "border-box";
     iframe.style.background = "black";
+    iframe.id = "arcade-screen";
+
     container.appendChild(iframe);
+
     iframe.addEventListener("load", () => {
       this.iframeWindow = iframe.contentWindow;
     });
 
     const css3dobject = new CSS3DObject(container);
-
     css3dobject.scale.copy(ARCADE_CSS_OBJECT_SCALE);
     css3dobject.position.copy(ARCADE_CSS_OBJECT_POSITION);
     css3dobject.rotateY(ARCADE_CSS_OBJECT_ROTATION_Y);
     css3dobject.rotateX(ARCADE_CSS_OBJECT_ROTATION_X);
+
     this.cssArcadeMachineScene.add(css3dobject);
+
     const materialCRT = new ShaderMaterial({
       blending: NoBlending,
       side: DoubleSide,
@@ -100,33 +113,34 @@ export default class ArcadeScreen {
         uVignetteOpacity: {
           value: CRT_UNIFORMS.uVignetteOpacity,
         },
-        uBrightness: { value: CRT_UNIFORMS.uBrightness },
+        uBrightness: {
+          value: CRT_UNIFORMS.uBrightness,
+        },
         uVignetteRoundness: {
           value: CRT_UNIFORMS.uVignetteOpacity,
         },
       },
-      vertexShader: vertexShader,
-      fragmentShader: fragmentShader,
+      vertexShader,
+      fragmentShader,
     });
-    // Create plane geometry
+
     const geometry = new PlaneGeometry(
       this.screenSize.width,
       this.screenSize.height
     );
-    // Create the GL plane mesh
-    this.model.screen = new Mesh(geometry, materialCRT);
 
-    // Copy the position, rotation and scale of the CSS plane to the GL plane
+    this.model.screen = new Mesh(geometry, materialCRT);
     this.model.screen.position.copy(css3dobject.position);
     this.model.screen.rotation.copy(css3dobject.rotation);
     this.model.screen.scale.copy(css3dobject.scale);
     this.model.screen.name = "arcadeMachineScreen";
 
-    // Add to gl scene
     this.model.arcadeMachineModel.add(this.model.screen);
   };
 
   handleKeyDownParent = (event) => {
+    if (!this.iframeWindow) return;
+
     this.iframeWindow.postMessage(
       { type: "keyDownParent", key: event.key },
       "*"
@@ -134,14 +148,19 @@ export default class ArcadeScreen {
   };
 
   handleKeyUpParent = (event) => {
-    this.iframeWindow.postMessage({ type: "keyUpParent", key: event.key }, "*");
+    if (!this.iframeWindow) return;
+
+    this.iframeWindow.postMessage(
+      { type: "keyUpParent", key: event.key },
+      "*"
+    );
   };
 
   onMouseMove = () => {
     if (
       this.objectRaycasted &&
       this.objectRaycasted.object &&
-      this.objectRaycasted.object.name == "arcadeMachine"
+      this.objectRaycasted.object.name === "arcadeMachine"
     ) {
       this.experience.navigation.orbitControls.enableDamping = false;
       this.experience.navigation.orbitControls.enabled = false;
@@ -160,22 +179,35 @@ export default class ArcadeScreen {
     window.addEventListener("message", this.receiveMessage, false);
     this.onMouseMove();
   };
+
   deactivateControls = () => {
     window.removeEventListener("keydown", this.handleKeyDownParent);
     window.removeEventListener("keyup", this.handleKeyUpParent);
     window.removeEventListener("pointermove", this.onMouseMove);
     window.removeEventListener("message", this.receiveMessage, false);
   };
+
   receiveMessage = (event) => {
-    if (event.data == "hit") {
-      this.audioManager.playSingleAudio("hit", 1);
-    } else if (event.data == "tetris") {
-      this.audioManager.playSingleAudio("tetris", 1);
-    } else if (event.data == "die") {
-      this.audioManager.playSingleAudio("die", 1);
-    } else if (event.data == "select1") {
-      this.audioManager.playSingleAudio("select1", 1);
-    } else if (event.data == "select2") {
-      this.audioManager.playSingleAudio("select2", 1);
+    if (!this.audioManager) return;
+
+    switch (event.data) {
+      case "hit":
+        this.audioManager.playSingleAudio("hit", 1);
+        break;
+      case "tetris":
+        this.audioManager.playSingleAudio("tetris", 1);
+        break;
+      case "die":
+        this.audioManager.playSingleAudio("die", 1);
+        break;
+      case "select1":
+        this.audioManager.playSingleAudio("select1", 1);
+        break;
+      case "select2":
+        this.audioManager.playSingleAudio("select2", 1);
+        break;
+      default:
+        break;
     }
   };
+}
