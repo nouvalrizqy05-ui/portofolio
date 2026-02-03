@@ -1,4 +1,4 @@
-import { Mesh, MeshBasicMaterial, SRGBColorSpace, Color } from "three";
+import { Mesh, MeshBasicMaterial, MeshStandardMaterial, PlaneGeometry, SRGBColorSpace, Color, DoubleSide } from "three";
 import Experience from "./Experience.js";
 
 export default class Baked {
@@ -56,10 +56,45 @@ export default class Baked {
         this.scene.add(this.model.arcade);
     }
 
-    // Social Media Icons - Penamaan pada level scene agar terdeteksi Raycaster
+    // --- REVISI: PHOTO FRAME GLOW ---
+    if (this.resources.items.myPhoto) {
+        const photoTexture = this.resources.items.myPhoto;
+        photoTexture.colorSpace = SRGBColorSpace;
+
+        // 1. Bingkai Glow (Bagian belakang yang menyala)
+        const frameGlowMaterial = new MeshBasicMaterial({ 
+            color: new Color('#8A2BE2'),
+            side: DoubleSide,
+            transparent: true,
+            opacity: 0.5
+        });
+        this.model.photoFrameBack = new Mesh(new PlaneGeometry(0.56, 0.56), frameGlowMaterial);
+
+        // 2. Foto Utama (Menggunakan MeshStandardMaterial agar bisa Emissive)
+        const photoMaterial = new MeshStandardMaterial({
+            map: photoTexture,
+            emissive: new Color('#8A2BE2'),
+            emissiveIntensity: 0.4,
+            side: DoubleSide
+        });
+        this.model.photoFrame = new Mesh(new PlaneGeometry(0.5, 0.5), photoMaterial);
+
+        // Atur Posisi (Gantikan koordinat itchio lama - contoh di tembok dekat meja)
+        const posX = 1.45, posY = 1.2, posZ = -1.98;
+        this.model.photoFrame.position.set(posX, posY, posZ);
+        this.model.photoFrameBack.position.set(posX, posY, posZ - 0.01);
+        
+        // Sesuaikan rotasi jika perlu
+        // this.model.photoFrame.rotation.y = Math.PI * 0.5;
+        // this.model.photoFrameBack.rotation.y = Math.PI * 0.5;
+
+        this.model.photoFrame.name = "photoFrame"; // Untuk Raycaster
+        this.scene.add(this.model.photoFrame, this.model.photoFrameBack);
+    }
+
+    // Social Media Icons
     this.model.linkedin = this.resources.items.linkedin.scene;
     this.model.linkedin.name = "linkedin";
-    
     this.model.github = this.resources.items.github.scene;
     this.model.github.name = "github";
 
@@ -67,16 +102,10 @@ export default class Baked {
     this.setMaterial(this.model.room1, this.model.material);
     this.setMaterial(this.model.room2, this.model.material2);
     this.setMaterial(this.model.room3, this.model.material3);
-    
-    // Gunakan material ungu untuk ikon sosial
     this.setMaterial(this.model.linkedin, this.purpleNeonMaterial);
     this.setMaterial(this.model.github, this.purpleNeonMaterial);
 
     // Add to Scene
-    this.scene.add(this.model.room1);
-    this.scene.add(this.model.room2);
-    this.scene.add(this.model.room3);
-    this.scene.add(this.model.linkedin);
-    this.scene.add(this.model.github);
+    this.scene.add(this.model.room1, this.model.room2, this.model.room3, this.model.linkedin, this.model.github);
   };
 }
