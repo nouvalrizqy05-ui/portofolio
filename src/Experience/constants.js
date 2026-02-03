@@ -183,7 +183,7 @@ export const RUBIK_SCALE = 0.021432;
 
 // Links
 export const LINKEDIN_URL = "https://www.linkedin.com/in/muhammad-nouval-ar-rizqy-9ba777378?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app";
-export const GITHUB_URL = "https://github.com/nouvalrizqy05-ui";
+export const GITHUB_URL = "https://github.com/nouvalarrrgh/";
 
 // Top Chair
 export const TOP_CHAIR_POSITION = new Vector3(1.4027, 0.496728, -1.21048);
