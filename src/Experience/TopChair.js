@@ -14,7 +14,7 @@ export default class TopChair {
     this.materialTopChair = this.experience.world.baked.model.material2.clone();
     
     // Mengatur warna ke Hitam (Gunakan abu-abu sangat gelap agar detail tekstur tetap terlihat)
-    this.materialTopChair.color = new Color('#111111');
+    this.materialTopChair.color = new Color('#5D4037');
 
     this.setModel();
     this.startAnimation();
