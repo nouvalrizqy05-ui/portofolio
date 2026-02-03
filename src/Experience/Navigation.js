@@ -106,25 +106,53 @@ export default class Navigation {
     });
   }
 
+  rubikWon = () => {
+    this.bringSceneBack();
+    this.activateScene();
+  };
+
+  bringSceneBack = () => {
+    const audioManager = this.experience.world.audioManager;
+    audioManager.playSingleAudio("whoosh", 0.2);
+    if (this.rubikMessage.classList.contains("show-rubik-message")) {
+      this.rubikMessage.classList.remove("show-rubik-message");
+    }
+    this.orbitControls.enableDamping = false;
+    this.orbitControls.enabled = false;
+    this.expandScene(this.experience.scene, this.sceneResult);
+    this.expandScene(this.experience.cssArcadeMachineScene, this.cssArcadeMachineSceneResult);
+    this.expandScene(this.experience.cssLeftMonitorScene, this.cssLeftMonitorSceneResult);
+    this.expandScene(this.experience.cssRightMonitorScene, this.cssRightMonitorSceneResult);
+    this.changeTarget(CAMERA_TARGET.x, CAMERA_TARGET.y, CAMERA_TARGET.z, 1);
+    this.backButton.classList.remove("show-back-button");
+  };
+
+  activateControls() {
+    window.addEventListener("keydown", this.onKeyDown, false);
+    window.addEventListener("pointermove", this.onMouseMove, false);
+    window.addEventListener("pointerdown", this.onMouseDown, false);
+    window.addEventListener("pointerup", this.onMouseUp, false);
+  }
+
+  deactivateControls() {
+    window.removeEventListener("keydown", this.onKeyDown, false);
+    window.removeEventListener("pointermove", this.onMouseMove, false);
+    window.removeEventListener("pointerdown", this.onMouseDown, false);
+    window.removeEventListener("pointerup", this.onMouseUp, false);
+  }
+
   checkIntersection() {
     this.raycaster.setFromCamera(this.mouse, this.camera.instance);
-
     const sceneToRaycast = this.scene.children.filter((child) => {
       return ELEMENTS_TO_RAYCAST.includes(child.name);
     });
-
     const intersects = this.raycaster.intersectObjects(sceneToRaycast, true);
-
     if (intersects && intersects.length) {
       let selectedObject = intersects[0].object;
-      
-      // REVISI: Mencari induk objek yang namanya ada di daftar raycast
       while (selectedObject.parent && !ELEMENTS_TO_RAYCAST.includes(selectedObject.name)) {
-          selectedObject = selectedObject.parent;
+        selectedObject = selectedObject.parent;
       }
-
       const isNewSelection = !this.selectedObjects.length || this.selectedObjects[0].name != selectedObject.name;
-
       this.selectedObjects = isNewSelection ? [selectedObject] : this.selectedObjects;
       this.objectRaycasted = this.selectedObjects[0].name;
       this.webglElement.style.cursor = "pointer";
@@ -165,27 +193,17 @@ export default class Navigation {
     this.startClick.y = this.mouse.y;
   };
 
-  onMouseUp = () => {
-    if (this.startClick.x == this.mouse.x && this.startClick.y == this.mouse.y) {
-      if (!this.isCameraMoving && this.objectRaycasted !== null && this.currentStage !== this.objectRaycasted) {
-        this.flyToPosition(this.objectRaycasted);
-      }
-    }
-    this.startClick.set(null, null);
-  };
+  clickOnActivity() {
+    this.deactivateControls();
+    this.webglElement.style.cursor = "auto";
+    this.isCameraMoving = true;
+    this.outlinePass.selectedObjects = [];
+  }
 
   flyToPosition = (key) => {
     const audioManager = this.experience.world.audioManager;
-
-    // Logika Klik Langsung untuk Sosial Media
-    if (key === "linkedin") {
-      window.open(LINKEDIN_URL, "_blank");
-      return;
-    }
-    if (key === "github") {
-      window.open(GITHUB_URL, "_blank");
-      return;
-    }
+    if (key === "linkedin") { window.open(LINKEDIN_URL, "_blank"); return; }
+    if (key === "github") { window.open(GITHUB_URL, "_blank"); return; }
 
     if (key !== "rubikGroup" && this.currentStage == "rubikGroup") {
       this.rubikMessage.classList.remove("show-rubik-message");
@@ -196,9 +214,7 @@ export default class Navigation {
     if (key != "whiteboard" && this.whiteboardButons.classList.contains("show-button-row")) {
         this.whiteboardButons.classList.remove("show-button-row");
     }
-    if (this.currentStage) {
-      this.deactivateActivityControls();
-    }
+    if (this.currentStage) this.deactivateActivityControls();
 
     switch (key) {
       case "arcadeMachine":
@@ -215,7 +231,7 @@ export default class Navigation {
         this.setupCameraMove(WHITEBOARD_CAMERA_POSITION, WHITEBOARD_CAMERA_QUATERNION, WHITEBOARD_CAMERA_TARGET, key);
         break;
       case "rubikGroup":
-        this.handleRubikTransition(key);
+        this.handleRubikNav(key);
         break;
     }
   };
@@ -230,7 +246,7 @@ export default class Navigation {
     this.clickOnActivity();
   }
 
-  handleRubikTransition(key) {
+  handleRubikNav(key) {
     this.experience.world.audioManager.playSingleAudio("whoosh", 0.2);
     this.rubikMessage.classList.add("show-rubik-message");
     this.backButton.classList.add("show-back-button");
@@ -245,6 +261,15 @@ export default class Navigation {
     this.changeTarget(RUBIK_TARGET.x, RUBIK_TARGET.y, RUBIK_TARGET.z, 1);
     this.clickOnActivity();
   }
+
+  onMouseUp = () => {
+    if (this.startClick.x == this.mouse.x && this.startClick.y == this.mouse.y) {
+      if (!this.isCameraMoving && this.objectRaycasted !== null && this.currentStage !== this.objectRaycasted) {
+        this.flyToPosition(this.objectRaycasted);
+      }
+    }
+    this.startClick.set(null, null);
+  };
 
   moveCamera(x, y, z, duration) {
     gsap.to(this.camera.instance.position, { x, y, z, duration, ease: "sine.out" });
@@ -270,27 +295,6 @@ export default class Navigation {
     gsap.to(this.orbitControls.target, { x, y, z, duration, ease: "sine.out" });
   }
 
-  clickOnActivity() {
-    this.deactivateControls();
-    this.webglElement.style.cursor = "auto";
-    this.isCameraMoving = true;
-    this.outlinePass.selectedObjects = [];
-  }
-
-  activateControls() {
-    window.addEventListener("keydown", this.onKeyDown, false);
-    window.addEventListener("pointermove", this.onMouseMove, false);
-    window.addEventListener("pointerdown", this.onMouseDown, false);
-    window.addEventListener("pointerup", this.onMouseUp, false);
-  }
-
-  deactivateControls() {
-    window.removeEventListener("keydown", this.onKeyDown, false);
-    window.removeEventListener("pointermove", this.onMouseMove, false);
-    window.removeEventListener("pointerdown", this.onMouseDown, false);
-    window.removeEventListener("pointerup", this.onMouseUp, false);
-  }
-
   shrinkScene(scene) {
     const originalPos = [];
     const originalScale = [];
@@ -301,10 +305,7 @@ export default class Navigation {
         gsap.to(child.position, { x: 0, y: 0, z: 0, duration: 1, ease: "sine.out" });
         originalScale.push(child.scale.clone());
         gsap.to(child.scale, { x: 0.0001, y: 0.0001, z: 0.0001, duration: 1, ease: "sine.out" });
-      } else {
-        originalPos.push(null);
-        originalScale.push(null);
-      }
+      } else { originalPos.push(null); originalScale.push(null); }
     });
     return { originalPos, originalScale };
   }
@@ -317,10 +318,7 @@ export default class Navigation {
           gsap.to(child.position, {
             x: result.originalPos[i].x, y: result.originalPos[i].y, z: result.originalPos[i].z,
             duration: 1, ease: "sine.out",
-            onComplete: () => {
-              this.orbitControls.enableDamping = true;
-              this.orbitControls.enabled = true;
-            },
+            onComplete: () => { this.orbitControls.enableDamping = true; this.orbitControls.enabled = true; },
           });
         }
         if (result.originalScale[i] !== null) {
@@ -329,18 +327,6 @@ export default class Navigation {
       }
     });
   }
-
-  bringSceneBack = () => {
-    this.experience.world.audioManager.playSingleAudio("whoosh", 0.2);
-    if (this.rubikMessage.classList.contains("show-rubik-message")) this.rubikMessage.classList.remove("show-rubik-message");
-    this.orbitControls.enabled = false;
-    this.expandScene(this.experience.scene, this.sceneResult);
-    this.expandScene(this.experience.cssArcadeMachineScene, this.cssArcadeMachineSceneResult);
-    this.expandScene(this.experience.cssLeftMonitorScene, this.cssLeftMonitorSceneResult);
-    this.expandScene(this.experience.cssRightMonitorScene, this.cssRightMonitorSceneResult);
-    this.changeTarget(CAMERA_TARGET.x, CAMERA_TARGET.y, CAMERA_TARGET.z, 1);
-    this.backButton.classList.remove("show-back-button");
-  };
 
   handleChangeEvent = () => {
     if (this.currentStage != null && this.orbitControls.enabled) {
@@ -373,9 +359,7 @@ export default class Navigation {
     const currentZoom = this.getCurrentZoom();
     if (this.currentStage === null) {
       this.banner.style.top = (currentZoom < 25 && this.mouse.y < 0.9) ? "-60px" : "0px";
-    } else {
-      this.banner.style.top = (this.mouse.y < 0.9) ? "-60px" : "0px";
-    }
+    } else { this.banner.style.top = (this.mouse.y < 0.9) ? "-60px" : "0px"; }
   };
 
   updateStage() {
