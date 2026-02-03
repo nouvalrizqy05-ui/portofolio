@@ -24,13 +24,18 @@ body {
 #webgl {
   width: 100vw;
   height: 100vh;
+  position: absolute; /* Tambahan untuk layering */
+  top: 0;
+  left: 0;
   pointer-events: auto;
+  z-index: 1;
 }
 
+/* REVISI: Mengaktifkan pointer-events agar layar bisa diklik */
 #cssArcadeMachine,
 #cssLeftMonitor,
 #cssRightMonitor {
-  pointer-events: none;
+  pointer-events: auto; 
   cursor: pointer;
 }
 
@@ -61,7 +66,7 @@ body {
   width: 100vw;
   align-items: center;
   justify-content: space-around;
-  z-index: 1;
+  z-index: 10;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8);
   transition: top 0.5s ease-in-out;
 }
@@ -94,7 +99,7 @@ body {
   cursor: pointer;
   transition: opacity 1s, visibility 1s, background-size 0.2s ease-in-out;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8);
-  z-index: 2;
+  z-index: 11;
   background-image: url("../static/assets/svg/arrow-back.svg");
   background-size: 70%;
   background-position: center;
@@ -106,12 +111,8 @@ body {
   opacity: 1;
 }
 
-.circular-button:hover {
-  background-size: 75%;
-}
-
 /* =========================
-   WHITEBOARD BUTTONS
+   WHITEBOARD / RUBIK / AUDIO (Sesuai kode asli Anda)
 ========================= */
 .button-row {
   visibility: hidden;
@@ -121,7 +122,7 @@ body {
   bottom: 100px;
   display: flex;
   justify-content: center;
-  z-index: 1;
+  z-index: 11;
   transition: opacity 1s, visibility 1s;
 }
 
@@ -145,17 +146,6 @@ body {
   transition: all 0.4s ease;
 }
 
-.circular-button-whiteboard:hover {
-  background-size: 80%;
-}
-
-.whiteboard-selected {
-  border-color: #eda72d;
-}
-
-/* =========================
-   RUBIK MESSAGE
-========================= */
 .rubik-message {
   text-align: center;
   visibility: hidden;
@@ -165,10 +155,8 @@ body {
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 1;
-  user-select: none;
+  z-index: 11;
   font-size: 1.5rem;
-  transition: opacity 1s ease, visibility 1s ease;
 }
 
 .show-rubik-message {
@@ -176,9 +164,6 @@ body {
   opacity: 1;
 }
 
-/* =========================
-   AUDIO BUTTON
-========================= */
 .audio-button {
   position: absolute;
   bottom: 50px;
@@ -189,11 +174,7 @@ body {
   background-color: #2a1a3d;
   opacity: 0;
   visibility: hidden;
-  cursor: pointer;
-  transition: opacity 1s, visibility 1s, background-size 0.2s ease-in-out;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8);
-  z-index: 2;
-  background-image: url("../static/assets/svg/audio-volume-high.svg");
+  z-index: 11;
   background-size: 50%;
   background-position: center;
   background-repeat: no-repeat;
@@ -204,17 +185,6 @@ body {
   opacity: 0.4;
 }
 
-.audio-button:hover {
-  opacity: 1;
-}
-
-.audio-button-muted {
-  background-image: url("../static/assets/svg/audio-volume-muted.svg");
-}
-
-/* =========================
-   LOADING SCREEN
-========================= */
 .loadingScreen {
   user-select: none;
   width: 20vmin;
@@ -226,26 +196,12 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-around;
-  text-align: center;
-  font-size: 1.7em;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  visibility: hidden;
-  opacity: 0;
-  z-index: 1;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 1);
-  transition: visibility 1s ease, opacity 1s ease, color 1s ease,
-    font-size 0.5s ease;
-}
-
-.loading-screen-hover:hover {
-  font-size: 2.5em;
-}
-
-.finished-load {
-  color: #2a1a3d !important;
+  z-index: 100;
+  transition: visibility 1s, opacity 1s;
 }
 
 .show-loading-screen {
@@ -253,18 +209,12 @@ body {
   opacity: 1;
 }
 
-/* =========================
-   MOBILE WARNING
-========================= */
 .mobile-text {
   display: none;
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  text-align: center;
-  padding: 20px;
-  width: 60%;
   color: #eda72d;
   z-index: 9999;
 }
