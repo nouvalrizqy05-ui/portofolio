@@ -81,9 +81,9 @@ export default class Baked {
 
         // POSISI BARU: Menyesuaikan dengan area hitam di dinding di atas meja
         // Angka ini digeser agar menjauh dari area kursi (sumbu X dan Y dinaikkan)
-        const posX = -0.01; // Tetap di sisi dinding kanan/belakang
-        const posY = 1.1; // Dinaikkan ke atas agar sejajar dengan baris ikon
-        const posZ = -0.5; // Kedalaman dinding
+        const posX = -0.5; // Tetap di sisi dinding kanan/belakang
+        const posY = 1.95; // Dinaikkan ke atas agar sejajar dengan baris ikon
+        const posZ = 2.00; // Kedalaman dinding
 
         this.model.photoFrame.position.set(posX, posY, posZ);
         this.model.photoFrameBack.position.set(posX, posY, posZ - 0.01);
