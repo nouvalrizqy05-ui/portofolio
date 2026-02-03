@@ -1,4 +1,4 @@
-import { Group, ShaderMaterial, DoubleSide, PlaneGeometry, Mesh } from "three";
+import { Group, ShaderMaterial, DoubleSide, PlaneGeometry, Mesh, Color } from "three"; // Tambahkan Color di sini
 
 import Experience from "./Experience.js";
 import fragmentShaderCarpet from "./shaders/shellTexturingCarpet/fragment.glsl";
@@ -21,6 +21,10 @@ export default class Carpet {
 
   setCarpet() {
     const shellCount = CARPET_SHELLCOUNT;
+    
+    // Warna Biru Langit (Sky Blue)
+    const skyBlueColor = new Color('#87CEEB'); 
+
     for (let i = 0; i < shellCount; ++i) {
       const shaderMaterial = new ShaderMaterial({
         vertexShader: vertexShaderCarpet,
@@ -28,7 +32,8 @@ export default class Carpet {
         side: DoubleSide,
         uniforms: {
           uColor: {
-            value: CARPET_UNIFORMS.uColor,
+            // Mengganti CARPET_UNIFORMS.uColor dengan warna biru langit
+            value: skyBlueColor, 
           },
           uShellCount: { value: CARPET_UNIFORMS.uShellCount },
           uShellIndex: { value: i },
