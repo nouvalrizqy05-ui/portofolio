@@ -85,6 +85,9 @@ export default class Navigation {
 
     this.backButton.addEventListener("click", () => {
       if (this.isCameraMoving) return;
+
+      // REVISI: Aktifkan kembali pointer events WebGL canvas saat kembali
+      this.webglElement.style.pointerEvents = "auto";
       
       if (this.currentStage == "rubikGroup" && !this.experience.world.rubiksCube.isMoving) {
         this.bringSceneBack();
@@ -142,23 +145,16 @@ export default class Navigation {
 
   checkIntersection() {
     this.raycaster.setFromCamera(this.mouse, this.camera.instance);
-
     const sceneToRaycast = this.scene.children.filter((child) => {
       return ELEMENTS_TO_RAYCAST.includes(child.name);
     });
-
     const intersects = this.raycaster.intersectObjects(sceneToRaycast, true);
-
     if (intersects && intersects.length) {
       let selectedObject = intersects[0].object;
-      
-      // Mencari parent yang namanya terdaftar di constants
       while (selectedObject.parent && !ELEMENTS_TO_RAYCAST.includes(selectedObject.name)) {
           selectedObject = selectedObject.parent;
       }
-
       const isNewSelection = !this.selectedObjects.length || this.selectedObjects[0].name != selectedObject.name;
-
       this.selectedObjects = isNewSelection ? [selectedObject] : this.selectedObjects;
       this.objectRaycasted = this.selectedObjects[0].name;
       this.webglElement.style.cursor = "pointer";
@@ -242,9 +238,9 @@ export default class Navigation {
         break;
       case "photoFrame":
         this.setupCameraMove(
-            { x: 0.5, y: 1.2, z: -1.0 }, // Posisi Kamera didepan foto
-            { x: 0, y: 0, z: 0, w: 1 },    // Rotasi Kamera
-            { x: 1.45, y: 1.2, z: -1.98 }, // Target Fokus foto
+            { x: 0.5, y: 1.2, z: -1.0 }, 
+            { x: 0, y: 0, z: 0, w: 1 }, 
+            { x: 1.45, y: 1.2, z: -1.98 }, 
             key
         );
         break;
@@ -375,14 +371,27 @@ export default class Navigation {
     } else { this.banner.style.top = (this.mouse.y < 0.9) ? "-60px" : "0px"; }
   };
 
+  // REVISI: Logika untuk melubangi canvas WebGL agar klik tembus ke monitor
   updateStage() {
     const world = this.experience.world;
     switch (this.currentStage) {
-      case "arcadeMachine": world.arcadeScreen.activateControls(); break;
-      case "whiteboard": world.whiteboard.activateControls(); break;
-      case "leftMonitor": world.leftMonitorScreen.activateControls(); break;
-      case "rightMonitor": world.rightMonitorScreen.activateControls(); break;
-      case "rubikGroup": world.rubiksCube.activateControls(); break;
+      case "leftMonitor":
+        this.webglElement.style.pointerEvents = "none"; // Lubangi canvas
+        world.leftMonitorScreen.activateControls();
+        break;
+      case "rightMonitor":
+        this.webglElement.style.pointerEvents = "none"; // Lubangi canvas
+        world.rightMonitorScreen.activateControls();
+        break;
+      case "arcadeMachine": 
+        world.arcadeScreen.activateControls(); 
+        break;
+      case "whiteboard": 
+        world.whiteboard.activateControls(); 
+        break;
+      case "rubikGroup": 
+        world.rubiksCube.activateControls(); 
+        break;
     }
   }
 
