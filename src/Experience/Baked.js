@@ -80,7 +80,7 @@ export default class Baked {
         this.model.photoFrame = new Mesh(new PlaneGeometry(0.5, 0.5), photoMaterial);
 
         // Atur Posisi (Z dimajukan ke -1.85 agar tidak 'flicker' atau tertutup tembok)
-        const posX = 1.45, posY = 1.2, posZ = -1.85; 
+        const posX = -0.5, posY = 1.8, posZ = -1.2; 
         this.model.photoFrame.position.set(posX, posY, posZ);
         this.model.photoFrameBack.position.set(posX, posY, posZ - 0.01);
 
