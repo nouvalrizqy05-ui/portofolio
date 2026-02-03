@@ -29,7 +29,7 @@ export default class Baked {
   setModels = () => {
     this.model = {};
 
-    // Material Dasar Room
+    // Load Textures
     this.bakedTexture1 = this.configureTexture(this.resources.items.baked1);
     this.model.material = new MeshBasicMaterial({ map: this.bakedTexture1 });
 
@@ -39,7 +39,7 @@ export default class Baked {
     this.bakedTexture3 = this.configureTexture(this.resources.items.baked3);
     this.model.material3 = new MeshBasicMaterial({ map: this.bakedTexture3 });
 
-    // MODIFIKASI: Material Khusus Ungu untuk Arcade & Ikon Sosial
+    // Material Ungu Neon untuk Arcade & Sosmed
     this.purpleNeonMaterial = this.model.material3.clone();
     this.purpleNeonMaterial.color = new Color('#8A2BE2');
 
@@ -51,13 +51,17 @@ export default class Baked {
     // Arcade Machine
     if (this.resources.items.arcadeMachine) {
         this.model.arcade = this.resources.items.arcadeMachine.scene;
+        this.model.arcade.name = "arcadeMachine"; 
         this.setMaterial(this.model.arcade, this.purpleNeonMaterial);
         this.scene.add(this.model.arcade);
     }
 
-    // Social Media Icons
+    // Social Media Icons - Penamaan pada level scene agar terdeteksi Raycaster
     this.model.linkedin = this.resources.items.linkedin.scene;
+    this.model.linkedin.name = "linkedin";
+    
     this.model.github = this.resources.items.github.scene;
+    this.model.github.name = "github";
 
     // Apply Materials
     this.setMaterial(this.model.room1, this.model.material);
@@ -69,6 +73,10 @@ export default class Baked {
     this.setMaterial(this.model.github, this.purpleNeonMaterial);
 
     // Add to Scene
-    this.scene.add(this.model.room1, this.model.room2, this.model.room3, this.model.linkedin, this.model.github);
+    this.scene.add(this.model.room1);
+    this.scene.add(this.model.room2);
+    this.scene.add(this.model.room3);
+    this.scene.add(this.model.linkedin);
+    this.scene.add(this.model.github);
   };
 }
