@@ -66,22 +66,20 @@ export default class Baked {
             color: new Color('#5D4037'),
             side: DoubleSide,
             transparent: true,
-            opacity: 0.6
+            opacity: 0.4
         });
         this.model.photoFrameBack = new Mesh(new PlaneGeometry(0.56, 0.56), frameGlowMaterial);
 
         // Foto Utama
         const photoMaterial = new MeshStandardMaterial({
             map: photoTexture,
-            emissive: new Color('#8A2BE2'),
-            emissiveIntensity: 0.5,
             side: DoubleSide
         });
         this.model.photoFrame = new Mesh(new PlaneGeometry(0.5, 0.5), photoMaterial);
 
         // POSISI BARU: Menyesuaikan dengan area hitam di dinding di atas meja
         // Angka ini digeser agar menjauh dari area kursi (sumbu X dan Y dinaikkan)
-        const posX = -0.83; // Tetap di sisi dinding kanan/belakang
+        const posX = -0.84; // Tetap di sisi dinding kanan/belakang
         const posY = 2.67; // Dinaikkan ke atas agar sejajar dengan baris ikon
         const posZ = -4.63; // Kedalaman dinding
 
