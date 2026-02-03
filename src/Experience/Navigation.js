@@ -23,7 +23,6 @@ import {
   RUBIK_TARGET,
   LINKEDIN_URL,
   GITHUB_URL,
-  ITCHIO_URL,
 } from "./constants.js";
 
 export default class Navigation {
@@ -405,9 +404,6 @@ export default class Navigation {
         break;
       case "github":
         window.open(GITHUB_URL);
-        break;
-      case "itchio":
-        window.open(ITCHIO_URL);
         break;
     }
   };
