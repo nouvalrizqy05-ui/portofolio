@@ -117,7 +117,6 @@ export default class Navigation {
     if (this.rubikMessage.classList.contains("show-rubik-message")) {
       this.rubikMessage.classList.remove("show-rubik-message");
     }
-    this.orbitControls.enableDamping = false;
     this.orbitControls.enabled = false;
     this.expandScene(this.experience.scene, this.sceneResult);
     this.expandScene(this.experience.cssArcadeMachineScene, this.cssArcadeMachineSceneResult);
@@ -143,16 +142,23 @@ export default class Navigation {
 
   checkIntersection() {
     this.raycaster.setFromCamera(this.mouse, this.camera.instance);
+
     const sceneToRaycast = this.scene.children.filter((child) => {
       return ELEMENTS_TO_RAYCAST.includes(child.name);
     });
+
     const intersects = this.raycaster.intersectObjects(sceneToRaycast, true);
+
     if (intersects && intersects.length) {
       let selectedObject = intersects[0].object;
+      
+      // Mencari parent yang namanya terdaftar di constants
       while (selectedObject.parent && !ELEMENTS_TO_RAYCAST.includes(selectedObject.name)) {
-        selectedObject = selectedObject.parent;
+          selectedObject = selectedObject.parent;
       }
+
       const isNewSelection = !this.selectedObjects.length || this.selectedObjects[0].name != selectedObject.name;
+
       this.selectedObjects = isNewSelection ? [selectedObject] : this.selectedObjects;
       this.objectRaycasted = this.selectedObjects[0].name;
       this.webglElement.style.cursor = "pointer";
@@ -193,15 +199,16 @@ export default class Navigation {
     this.startClick.y = this.mouse.y;
   };
 
-  clickOnActivity() {
-    this.deactivateControls();
-    this.webglElement.style.cursor = "auto";
-    this.isCameraMoving = true;
-    this.outlinePass.selectedObjects = [];
-  }
+  onMouseUp = () => {
+    if (this.startClick.x == this.mouse.x && this.startClick.y == this.mouse.y) {
+      if (!this.isCameraMoving && this.objectRaycasted !== null && this.currentStage !== this.objectRaycasted) {
+        this.flyToPosition(this.objectRaycasted);
+      }
+    }
+    this.startClick.set(null, null);
+  };
 
   flyToPosition = (key) => {
-    const audioManager = this.experience.world.audioManager;
     if (key === "linkedin") { window.open(LINKEDIN_URL, "_blank"); return; }
     if (key === "github") { window.open(GITHUB_URL, "_blank"); return; }
 
@@ -231,7 +238,15 @@ export default class Navigation {
         this.setupCameraMove(WHITEBOARD_CAMERA_POSITION, WHITEBOARD_CAMERA_QUATERNION, WHITEBOARD_CAMERA_TARGET, key);
         break;
       case "rubikGroup":
-        this.handleRubikNav(key);
+        this.handleRubikTransition(key);
+        break;
+      case "photoFrame":
+        this.setupCameraMove(
+            { x: 0.5, y: 1.2, z: -1.0 }, // Posisi Kamera didepan foto
+            { x: 0, y: 0, z: 0, w: 1 },    // Rotasi Kamera
+            { x: 1.45, y: 1.2, z: -1.98 }, // Target Fokus foto
+            key
+        );
         break;
     }
   };
@@ -246,7 +261,7 @@ export default class Navigation {
     this.clickOnActivity();
   }
 
-  handleRubikNav(key) {
+  handleRubikTransition(key) {
     this.experience.world.audioManager.playSingleAudio("whoosh", 0.2);
     this.rubikMessage.classList.add("show-rubik-message");
     this.backButton.classList.add("show-back-button");
@@ -261,15 +276,6 @@ export default class Navigation {
     this.changeTarget(RUBIK_TARGET.x, RUBIK_TARGET.y, RUBIK_TARGET.z, 1);
     this.clickOnActivity();
   }
-
-  onMouseUp = () => {
-    if (this.startClick.x == this.mouse.x && this.startClick.y == this.mouse.y) {
-      if (!this.isCameraMoving && this.objectRaycasted !== null && this.currentStage !== this.objectRaycasted) {
-        this.flyToPosition(this.objectRaycasted);
-      }
-    }
-    this.startClick.set(null, null);
-  };
 
   moveCamera(x, y, z, duration) {
     gsap.to(this.camera.instance.position, { x, y, z, duration, ease: "sine.out" });
@@ -293,6 +299,13 @@ export default class Navigation {
 
   changeTarget(x, y, z, duration) {
     gsap.to(this.orbitControls.target, { x, y, z, duration, ease: "sine.out" });
+  }
+
+  clickOnActivity() {
+    this.deactivateControls();
+    this.webglElement.style.cursor = "auto";
+    this.isCameraMoving = true;
+    this.outlinePass.selectedObjects = [];
   }
 
   shrinkScene(scene) {
