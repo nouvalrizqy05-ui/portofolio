@@ -56,21 +56,21 @@ export default class Baked {
         this.scene.add(this.model.arcade);
     }
 
-    // --- REVISI: PHOTO FRAME GLOW ---
+    // --- REVISI POSISI PHOTO FRAME ---
     if (this.resources.items.myPhoto) {
         const photoTexture = this.resources.items.myPhoto;
         photoTexture.colorSpace = SRGBColorSpace;
 
-        // Bingkai Glow (Bagian belakang yang menyala menggunakan MeshBasicMaterial)
+        // Bingkai Glow Belakang
         const frameGlowMaterial = new MeshBasicMaterial({ 
-            color: new Color('#8A2BE2'),
+            color: new Color('#5D4037'),
             side: DoubleSide,
             transparent: true,
-            opacity: 0.5
+            opacity: 0.6
         });
         this.model.photoFrameBack = new Mesh(new PlaneGeometry(0.56, 0.56), frameGlowMaterial);
 
-        // Foto Utama (Menggunakan MeshStandardMaterial agar mendukung fitur emissive/cahaya)
+        // Foto Utama
         const photoMaterial = new MeshStandardMaterial({
             map: photoTexture,
             emissive: new Color('#8A2BE2'),
@@ -79,8 +79,12 @@ export default class Baked {
         });
         this.model.photoFrame = new Mesh(new PlaneGeometry(0.5, 0.5), photoMaterial);
 
-        // Atur Posisi (Z dimajukan ke -1.85 agar tidak 'flicker' atau tertutup tembok)
-        const posX = -0.5, posY = 1.8, posZ = -1.2; 
+        // POSISI BARU: Menyesuaikan dengan area hitam di dinding di atas meja
+        // Angka ini digeser agar menjauh dari area kursi (sumbu X dan Y dinaikkan)
+        const posX = 1.45; // Tetap di sisi dinding kanan/belakang
+        const posY = 1.95; // Dinaikkan ke atas agar sejajar dengan baris ikon
+        const posZ = -1.95; // Kedalaman dinding
+
         this.model.photoFrame.position.set(posX, posY, posZ);
         this.model.photoFrameBack.position.set(posX, posY, posZ - 0.01);
 
@@ -88,20 +92,19 @@ export default class Baked {
         this.scene.add(this.model.photoFrame, this.model.photoFrameBack);
     }
 
-    // 5. Konfigurasi Ikon Sosial
+    // 5. Ikon Sosial Media
     this.model.linkedin = this.resources.items.linkedin.scene;
     this.model.linkedin.name = "linkedin";
     this.model.github = this.resources.items.github.scene;
     this.model.github.name = "github";
 
-    // 6. Apply Materials
+    // 6. Apply Materials & Add to Scene
     this.setMaterial(this.model.room1, this.model.material);
     this.setMaterial(this.model.room2, this.model.material2);
     this.setMaterial(this.model.room3, this.model.material3);
     this.setMaterial(this.model.linkedin, this.purpleNeonMaterial);
     this.setMaterial(this.model.github, this.purpleNeonMaterial);
 
-    // 7. Add to Scene
     this.scene.add(this.model.room1, this.model.room2, this.model.room3, this.model.linkedin, this.model.github);
   };
 }
