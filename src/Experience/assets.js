@@ -48,7 +48,6 @@ export default [
       { name: "arcadeMachine", source: "/assets/models/arcadeMachine.glb" },
       { name: "linkedin", source: "/assets/models/linkedin.glb" },
       { name: "github", source: "/assets/models/github.glb" },
-      { name: "itchio", source: "/assets/models/itchio.glb" },
       {
         name: "cubeTexture",
         source: [
