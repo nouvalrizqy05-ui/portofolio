@@ -53,15 +53,12 @@ export default class Baked {
     this.model.linkedin.name = "linkedin";
     this.model.github = this.resources.items.github.scene;
     this.model.github.name = "github";
-    this.model.itchio = this.resources.items.itchio.scene;
-    this.model.itchio.name = "itchio";
 
     this.setMaterial(this.model.room1, this.model.material);
     this.setMaterial(this.model.room2, this.model.material2);
     this.setMaterial(this.model.room3, this.model.material3);
     this.setMaterial(this.model.linkedin, this.model.material3);
     this.setMaterial(this.model.github, this.model.material3);
-    this.setMaterial(this.model.itchio, this.model.material3);
 
     this.scene.add(this.model.room1);
     this.scene.add(this.model.room2);
@@ -69,6 +66,5 @@ export default class Baked {
 
     this.scene.add(this.model.linkedin);
     this.scene.add(this.model.github);
-    this.scene.add(this.model.itchio);
   };
 }
