@@ -11,7 +11,6 @@ float PI = 3.1415926538;
 
 vec2 curveRemapUV(vec2 uv)
 {
-    // as we near the edge of our screen apply greater distortion using a sinusoid.
     uv = uv * 2.0 - 1.0;
     vec2 offset = abs(uv.yx) / vec2(uCurvature.x, uCurvature.y);
     uv = uv + uv * offset * offset;
@@ -35,17 +34,18 @@ vec4 vignetteIntensity(vec2 uv, vec2 resolution, float opacity, float roundness)
 void main(void)
 {
     vec2 remappedUV = curveRemapUV(vec2(vUv.x, vUv.y));
-    vec4 baseColor = vec4(uBaseColor, 0.00001);
+    
+    // MODIFIKASI: Campurkan warna dasar dengan Ungu Neon (#8A2BE2)
+    vec3 neonPurple = vec3(0.54, 0.17, 0.89); 
+    vec4 baseColor = vec4(mix(uBaseColor, neonPurple, 0.8), 1.0);
 
     baseColor *= vignetteIntensity(remappedUV, uScreenResolution, uVignetteOpacity, uVignetteRoundness);
-
     baseColor *= scanLineIntensity(remappedUV.x, uScreenResolution.y, uScanLineOpacity.x);
     baseColor *= scanLineIntensity(remappedUV.y, uScreenResolution.x, uScanLineOpacity.y);
-
     baseColor *= vec4(vec3(uBrightness), 1.0);
 
     if (remappedUV.x < 0.0 || remappedUV.y < 0.0 || remappedUV.x > 1.0 || remappedUV.y > 1.0){
-        gl_FragColor = vec4(uColor, 0.001);
+        gl_FragColor = vec4(neonPurple, 1.0); // Warna border layar jadi ungu
     } else {
         gl_FragColor = baseColor;
     }
