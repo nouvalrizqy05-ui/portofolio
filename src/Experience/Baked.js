@@ -1,4 +1,4 @@
-import { Mesh, MeshBasicMaterial, MeshStandardMaterial, PlaneGeometry, SRGBColorSpace, Color, DoubleSide } from "three";
+import { Mesh, MeshBasicMaterial, MeshBasicMaterial, PlaneGeometry, SRGBColorSpace, Color, DoubleSide } from "three";
 import Experience from "./Experience.js";
 
 export default class Baked {
@@ -70,9 +70,10 @@ export default class Baked {
         });
         this.model.photoFrameBack = new Mesh(new PlaneGeometry(0.56, 0.56), frameGlowMaterial);
 
-        // 2. Foto Utama (Menggunakan MeshStandardMaterial agar bisa Emissive)
-        const photoMaterial = new MeshStandardMaterial({
+        // 2. Foto Utama (Menggunakan MeshBasicMaterial agar bisa Emissive)
+        const photoMaterial = new MeshBasicMaterial({
             map: photoTexture,
+          side: DoubleSide,
             emissive: new Color('#8A2BE2'),
             emissiveIntensity: 0.4,
             side: DoubleSide
@@ -80,7 +81,7 @@ export default class Baked {
         this.model.photoFrame = new Mesh(new PlaneGeometry(0.5, 0.5), photoMaterial);
 
         // Atur Posisi (Gantikan koordinat itchio lama - contoh di tembok dekat meja)
-        const posX = 1.45, posY = 1.2, posZ = -1.98;
+        const posX = 1.45, posY = 1.2, posZ = -1.85;
         this.model.photoFrame.position.set(posX, posY, posZ);
         this.model.photoFrameBack.position.set(posX, posY, posZ - 0.01);
         
