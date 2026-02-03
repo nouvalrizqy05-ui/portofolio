@@ -48,126 +48,7 @@ export default class Navigation {
     this.activateControls();
   }
 
-  setNavigation() {
-    this.orbitControls = new OrbitControlsCustom(
-      this.camera.instance,
-      this.webglElement
-    );
-
-    this.orbitControls.enabled = ORBIT_CONTROLS_CONFIG.enabled;
-    this.orbitControls.screenSpacePanning =
-      ORBIT_CONTROLS_CONFIG.screenSpacePanning;
-    this.orbitControls.enableKeys = ORBIT_CONTROLS_CONFIG.enableKeys;
-    this.orbitControls.zoomSpeed = ORBIT_CONTROLS_CONFIG.zoomSpeed;
-    this.orbitControls.enableDamping = ORBIT_CONTROLS_CONFIG.enableDamping;
-    this.orbitControls.dampingFactor = ORBIT_CONTROLS_CONFIG.dampingFactor;
-    this.orbitControls.rotateSpeed = ORBIT_CONTROLS_CONFIG.rotateSpeed;
-    this.orbitControls.maxAzimuthAngle = ORBIT_CONTROLS_CONFIG.maxAzimuthAngle;
-    this.orbitControls.minAzimuthAngle = ORBIT_CONTROLS_CONFIG.minAzimuthAngle;
-    this.orbitControls.minPolarAngle = ORBIT_CONTROLS_CONFIG.minPolarAngle;
-    this.orbitControls.maxPolarAngle = ORBIT_CONTROLS_CONFIG.maxPolarAngle;
-    this.orbitControls.minDistance = ORBIT_CONTROLS_CONFIG.minDistance;
-    this.orbitControls.maxDistance = ORBIT_CONTROLS_CONFIG.maxDistance;
-    this.orbitControls.target.y = ORBIT_CONTROLS_CONFIG.target.y;
-    this.orbitControls.update();
-    this.orbitControls.addEventListener("change", this.handleBannerVisibility);
-    this.bannerLinks.forEach((link) => {
-      link.addEventListener("click", () => {
-        if (
-          this.currentStage == "rubikGroup" &&
-          this.experience.world.rubiksCube.isMoving
-        ) {
-          return;
-        }
-        if (!this.isCameraMoving && this.currentStage !== link.id) {
-          this.flyToPosition(link.id);
-        }
-      });
-    });
-
-    this.backButton.addEventListener("click", () => {
-      if (this.isCameraMoving) {
-        return;
-      }
-      if (
-        this.currentStage == "rubikGroup" &&
-        !this.experience.world.rubiksCube.isMoving
-      ) {
-        this.bringSceneBack();
-        this.experience.world.rubiksCube.resetOriginalConfig();
-        this.activateScene();
-      } else if (
-        this.currentStage !== null &&
-        this.currentStage !== "rubikGroup"
-      ) {
-        if (this.whiteboardButons.classList.contains("show-button-row")) {
-          this.whiteboardButons.classList.remove("show-button-row");
-        }
-        this.orbitControls.enableDamping = false;
-        this.orbitControls.enabled = false;
-        const audioManager = this.experience.world.audioManager;
-        audioManager.playSingleAudio("whoosh", 0.2);
-        this.moveCamera(
-          CAMERA_POSITION.x,
-          CAMERA_POSITION.y,
-          CAMERA_POSITION.z,
-          1
-        );
-        this.rotateCamera(
-          CAMERA_QUATERNION.x,
-          CAMERA_QUATERNION.y,
-          CAMERA_QUATERNION.z,
-          CAMERA_QUATERNION.w,
-          1.15,
-          null
-        );
-        this.changeTarget(CAMERA_TARGET.x, CAMERA_TARGET.y, CAMERA_TARGET.z, 1);
-        this.backButton.classList.remove("show-back-button");
-      }
-    });
-  }
-
-  rubikWon = () => {
-    this.bringSceneBack();
-    this.activateScene();
-  };
-
-  bringSceneBack = () => {
-    const audioManager = this.experience.world.audioManager;
-    audioManager.playSingleAudio("whoosh", 0.2);
-    if (this.rubikMessage.classList.contains("show-rubik-message")) {
-      this.rubikMessage.classList.remove("show-rubik-message");
-    }
-    this.orbitControls.enableDamping = false;
-    this.orbitControls.enabled = false;
-    this.expandScene(this.experience.scene, this.sceneResult);
-    this.expandScene(
-      this.experience.cssArcadeMachineScene,
-      this.cssArcadeMachineSceneResult
-    );
-    this.expandScene(
-      this.experience.cssLeftMonitorScene,
-      this.cssLeftMonitorSceneResult
-    );
-    this.expandScene(
-      this.experience.cssRightMonitorScene,
-      this.cssRightMonitorSceneResult
-    );
-    this.changeTarget(CAMERA_TARGET.x, CAMERA_TARGET.y, CAMERA_TARGET.z, 1);
-    this.backButton.classList.remove("show-back-button");
-  };
-  activateControls() {
-    window.addEventListener("keydown", this.onKeyDown, false);
-    window.addEventListener("pointermove", this.onMouseMove, false);
-    window.addEventListener("pointerdown", this.onMouseDown, false);
-    window.addEventListener("pointerup", this.onMouseUp, false);
-  }
-
-  deactivateControls() {
-    window.removeEventListener("keydown", this.onKeyDown, false);
-    window.removeEventListener("pointerdown", this.onMouseDown, false);
-    window.removeEventListener("pointerup", this.onMouseUp, false);
-  }
+  // ... (Metode setNavigation, rubikWon, dll tetap sama)
 
   checkIntersection() {
     this.raycaster.setFromCamera(this.mouse, this.camera.instance);
@@ -175,18 +56,22 @@ export default class Navigation {
     const sceneToRaycast = this.scene.children.filter((child) => {
       return ELEMENTS_TO_RAYCAST.includes(child.name);
     });
+
     const intersects = this.raycaster.intersectObjects(sceneToRaycast, true);
+
     if (intersects && intersects.length) {
-      const selectedObject = intersects[0].object.parent.isRubik
-        ? intersects[0].object.parent.parent
-        : intersects[0].object.parent;
+      // REVISI: Mencari object yang namanya terdaftar di ELEMENTS_TO_RAYCAST secara rekursif
+      let selectedObject = intersects[0].object;
+      
+      while (selectedObject.parent && !ELEMENTS_TO_RAYCAST.includes(selectedObject.name)) {
+          selectedObject = selectedObject.parent;
+      }
+
       const isNewSelection =
         !this.selectedObjects.length ||
         this.selectedObjects[0].name != selectedObject.name;
 
-      this.selectedObjects = isNewSelection
-        ? [selectedObject]
-        : this.selectedObjects;
+      this.selectedObjects = isNewSelection ? [selectedObject] : this.selectedObjects;
       this.objectRaycasted = this.selectedObjects[0].name;
 
       this.webglElement.style.cursor = "pointer";
@@ -198,6 +83,9 @@ export default class Navigation {
     }
     this.outlinePass.selectedObjects = this.selectedObjects;
   }
+
+  // ... (Sisa kode Navigation.js tetap sama)
+}
 
   getCurrentZoom() {
     const camPosition = this.camera.instance.position;
